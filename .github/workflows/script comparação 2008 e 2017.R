@@ -9,19 +9,15 @@ setwd("~/RAIS") #pasta em que o arquivo está
 RAISDF201718a65d <- read.table("RAISDF201718a65d.csv", header=TRUE, sep=";")
 
 
-#base para homens e para mulheres
-mulheresdf201718a65 <- RAISDF201718a65d%>% filter(Sexo.Trabalhador==2)
-homensdf201718a65 <- RAISDF201718a65d%>% filter(Sexo.Trabalhador==1)
+# install.packages("srvyr")
+library(srvyr)
 
 
 #####################ESCOLARIDADE
-escoltotal <- table(RAISDF201718a65d$escolaridade, RAISDF201718a65d$trabresPP)
 
-# escolmulheres <- 
-table( mulheresdf201718a65$escolaridade, mulheresdf201718a65$trabresPP)
-
-# escolhomens <- 
-table( homensdf201718a65$escolaridade, homensdf201718a65$trabresPP)
+escoltotal <- RAISDF201718a65d %>%
+  group_by(Sexo.Trabalhador, escolaridade, trabresPP) %>%
+  summarise(n = n())
 
 write.table(escoltotal , file='escolaridade.csv',sep=';',na="",quote=TRUE, row.names=TRUE)
 
@@ -58,25 +54,18 @@ table(RAISDF201718a65d$CBOGrGrupo2002)
 
 
 #####POR CBO
-CBOtotal <- table(RAISDF201718a65d$CBOGrGrupo2002, RAISDF201718a65d$trabresPP)
 
-CBOmulheres <- table(mulheresdf201718a65$CBOGrGrupo2002, mulheresdf201718a65$trabresPP)
-
-CBOhomens <- table(homensdf201718a65$CBOGrGrupo2002, homensdf201718a65$trabresPP)
-
+CBOtotal<- RAISDF201718a65d %>%
+  group_by(Sexo.Trabalhador, CBOGrGrupo2002, trabresPP) %>%
+  summarise(n = n())
 
 write.table(CBOtotal , file='CBO.csv',sep=';',na="",quote=TRUE, row.names=TRUE)
 
-write.table(CBOmulheres, file='CBOmulheres.csv',sep=';',na="",quote=TRUE, row.names=TRUE)
-
-write.table(CBOhomens, file='CBOhomens.csv',sep=';',na="",quote=TRUE, row.names=TRUE)
 
 #################################salario por cbo
-# install.packages("srvyr")
-library(srvyr)
 
 cbomediassal <- RAISDF201718a65d %>% 
-  group_by(sexo, CBOGrGrupo2002, trabresPP) %>% 
+  group_by(Sexo.Trabalhador, CBOGrGrupo2002, trabresPP) %>% 
   summarise(media=mean(remmediadef, vartype = "se", na.rm = T),
             mediana=median(remmediadef, vartype = "se", na.rm = T))
 
